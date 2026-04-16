@@ -1,0 +1,20 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: sqs-scaledobject
+  namespace: kedademo
+spec:
+  scaleTargetRef:
+    name: consumer
+  minReplicaCount: 0          # allow scale-to-zero
+  maxReplicaCount: 10         # upper limit
+  pollingInterval: 15         # check queue every 15s
+  cooldownPeriod: 30          # scale down quickly after empty
+  triggers:
+  - type: aws-sqs-queue
+    metadata:
+      queueURL: ""
+      awsRegion: us-east-1
+      queueLength: "5"        # 1 replica per 5 messages
+    authenticationRef:
+      name: keda-aws-auth
